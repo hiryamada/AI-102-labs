@@ -1,0 +1,102 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"pwsh","items":[{"aliases":[],"languageName":"pwsh","name":"pwsh"}]}}
+
+#!markdown
+
+# Lab 01
+
+#!markdown
+
+Log in to Azure using interactive login
+
+#!pwsh
+
+az login
+
+#!markdown
+
+In the Azure portal, check "Consent to Responsible AI Notice"
+
+#!pwsh
+
+start https://portal.azure.com/#create/Microsoft.CognitiveServicesAllInOne
+
+#!markdown
+
+Register the Microsoft.CognitiveServices resource provider with your subscription
+
+#!pwsh
+
+az provider register --namespace Microsoft.CognitiveServices --wait
+
+#!markdown
+
+Create a multi-service account resource
+
+#!pwsh
+
+$name='resource'+$(Get-Random -Minimum -100000 -Maximum 999999)
+$group=$(az group list --query '[].name' -otsv)
+$location=$(az group show -n ResourceGroup1 --query location -otsv)
+az cognitiveservices account create `
+-g $group -n $name -l $location --kind CognitiveServices `
+--custom-domain $name --sku s0 --yes > $name.json
+if ($?) {echo success} else {echo failed}
+
+#!markdown
+
+Get the resource endpoint and key and set them in environment variables
+
+#!pwsh
+
+$endpoint=$(az cognitiveservices account show --name $name --resource-group $group --query 'properties.endpoint' -otsv)
+$key=$(az cognitiveservices account keys list --name $name --resource-group $group --query 'key1' -otsv)
+$Env:AIServicesEndpoint=$endpoint
+$Env:AIServicesKey=$key
+setx AIServicesEndpoint $endpoint
+setx AIServicesKey $key
+
+#!markdown
+
+Clone the sample code repository
+
+#!pwsh
+
+mkdir c:\lab
+cd c:\lab
+git clone https://github.com/MicrosoftLearning/mslearn-ai-services
+cd mslearn-ai-services\Labfiles\01-use-azure-ai-services\C-Sharp\sdk-client
+
+#!markdown
+
+Add Text Analytics package
+
+#!pwsh
+
+dotnet add package Azure.AI.TextAnalytics --version 5.3.0 | Select-String -Pattern 'added'
+
+#!markdown
+
+Add package to read configurations from environment variables
+
+#!pwsh
+
+dotnet add package Microsoft.Extensions.Configuration.EnvironmentVariables --version 8.0.0 | Select-String -Pattern 'added'
+
+#!markdown
+
+Add code to read environment variables to .NET Configuration
+
+#!pwsh
+
+& "C:\Program Files\Git\bin\bash.exe" -c `
+"sed -i 's/AddJsonFile(.appsettings.json.)/&.AddEnvironmentVariables()/' Program.cs"
+
+#!markdown
+
+Run the code
+
+#!pwsh
+
+echo "hello`nquit`n" |dotnet run
