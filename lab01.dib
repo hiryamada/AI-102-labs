@@ -14,6 +14,10 @@ Log in to Azure using interactive login
 
 az login
 
+#!pwsh
+
+$env:AZURE_CONFIG_DIR = "temp"
+
 #!markdown
 
 In the Azure portal, check "Consent to Responsible AI Notice"
@@ -63,10 +67,27 @@ Clone the sample code repository
 
 #!pwsh
 
-mkdir c:\lab
-cd c:\lab
-git clone https://github.com/MicrosoftLearning/mslearn-ai-services
-cd mslearn-ai-services\Labfiles\01-use-azure-ai-services\C-Sharp\sdk-client
+#mkdir c:\lab
+#cd c:\lab
+#git clone https://github.com/MicrosoftLearning/mslearn-ai-services
+#cd mslearn-ai-services\Labfiles\01-use-azure-ai-services\C-Sharp\sdk-client
+
+#!markdown
+
+Download sample codes
+
+#!pwsh
+
+(New-Object System.Net.WebClient).DownloadFile("https://github.com/MicrosoftLearning/mslearn-ai-services/archive/refs/heads/main.zip", "main.zip")
+expand-archive main.zip
+
+#!markdown
+
+Move to the lab folder
+
+#!pwsh
+
+cd main/mslearn-ai-services-main/Labfiles/01-use-azure-ai-services/C-Sharp/sdk-client
 
 #!markdown
 
